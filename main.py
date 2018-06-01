@@ -185,14 +185,14 @@ print("wordvec vocabulary length:",len(thrones2vec.wv.vocab))
 thrones2vec.train(sentences,total_examples=len(sentences),epochs=10)
 
 
-# In[18]:
+# In[16]:
 
 
 if not os.path.exists("trained_sad"):
     os.makedirs("trained_sad")
 
 
-# In[19]:
+# In[17]:
 
 
 thrones2vec.save(os.path.join("trained_sad","thrones2vec.w2v"))
@@ -200,7 +200,7 @@ thrones2vec.save(os.path.join("trained_sad","thrones2vec.w2v"))
 
 # # load trained module
 
-# In[20]:
+# In[18]:
 
 
 thrones2vec=w2v.Word2Vec.load(os.path.join("trained_sad","thrones2vec.w2v"))
@@ -208,41 +208,68 @@ thrones2vec=w2v.Word2Vec.load(os.path.join("trained_sad","thrones2vec.w2v"))
 
 # # compress the word vectors into 2d space and plot them
 
-# In[21]:
+# In[ ]:
 
 
 tsne=sklearn.manifold.TSNE(n_components=2,random_state=0)
 
 
-# In[24]:
+# In[20]:
 
 
 all_word_vectors_matrix=thrones2vec.wv.syn0
 
 
-# In[25]:
+# In[21]:
 
 
 all_word_vectors_matrix_2d=tsne.fit_transform(all_word_vectors_matrix)
 
 
-# In[26]:
+# In[28]:
 
 
-points=pd.DataFrame{ 
+points=pd.DataFrame(
     [
         (word,coords[0],coords[1])
         for word,coords in[
-            (word,all_word_vectors_matrix_2d[thrones2vec.vocab[word].index])
-            for word in thrones2vec.vocab
+            (word,all_word_vectors_matrix_2d[thrones2vec.wv.vocab[word].index])
+            for word in thrones2vec.wv.vocab
         ]
     ],
-    colums=["word","x","y"]
-}
+    columns=["word","x","y"]
+)
 
+
+# In[29]:
+
+
+points.head(10)
+
+
+# In[30]:
+
+
+sns.set_context("poster")
+
+
+# In[36]:
+
+
+points.plot.scatter("x","y",c='b')
+
+
+# # now we see close vector
 
 # In[ ]:
 
 
-points.head(10)
+def close_sadan_region(x_bounds,y_bounds):
+    slice=points[
+        (x_bounds[0]<=points.x)&
+        (points.x<=x_bounds[1])&
+        (y_bounds[0]<=points.y)&
+        (points.y<=y_bounds[1])
+    ]
+ax=slice.plot.scatter()
 
